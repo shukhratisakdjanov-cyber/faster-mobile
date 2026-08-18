@@ -90,8 +90,6 @@ pnpm exec jest --runInBand
 
 For Jest-based consumers, allow `@shukhratisakdjanov-cyber/faster-mobile` through `transformIgnorePatterns`: React Native resolves its `react-native` export to TypeScript source, which Jest must transform just like React Native itself. The native example’s [Jest configuration](example/native/jest.config.js) is a working reference.
 
-On 18 August 2026, a packed library tarball was installed into an isolated clean copy of the native host. Its type check, lint, Jest test, iOS build, and simulator runtime passed; the host imported Button, Input, Dialog, and ThemeProvider only from the public package API.
-
 To install the published package in an external consumer, configure that consumer's `.npmrc` without committing a token:
 
 ```ini
