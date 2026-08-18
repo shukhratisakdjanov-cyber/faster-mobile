@@ -94,7 +94,7 @@ On 18 August 2026, a packed library tarball was installed into an isolated clean
 
 GitHub Actions runs two pull-request checks: `library` validates the package itself (lint, types, tests, build, and packed contents), while `native-host` validates the example app, generated Storybook registry, native-host types/lint, and its Jest test. Native simulator and Android checks remain intentionally outside pull-request CI because they are slower and are deferred in this exercise.
 
-Publishing is defined in `.github/workflows/release.yml` and uses Changesets. For a user-facing change, run `pnpm changeset`, choose its patch/minor/major semantic-version bump, and commit the generated Markdown file. A push to `main` turns pending changesets into a reviewed version pull request; merging that pull request publishes `@shukhratisakdjanov-cyber/faster-mobile` to GitHub Packages and creates the matching Git tag. The release requires the `github-packages` GitHub environment variable `PUBLISH_ENABLED` to be `true`. It uses its repository-scoped `GITHUB_TOKEN` with `packages: write`; no personal access token is stored in the repository.
+Publishing is defined in `.github/workflows/release.yml` and uses Changesets. For a user-facing change, run `pnpm changeset`, choose its patch/minor/major semantic-version bump, and commit the generated Markdown file. A push to `main` turns pending changesets into a reviewed version pull request; merging that pull request publishes `@shukhratisakdjanov-cyber/faster-mobile` to GitHub Packages and creates the matching Git tag. The release requires the repository variable `PUBLISH_ENABLED` to be `true`; the `github-packages` environment remains the approval and protection boundary. It uses its repository-scoped `GITHUB_TOKEN` with `packages: write`; no personal access token is stored in the repository.
 
 Consumers route this scope to GitHub Packages with the committed `.npmrc`. To install a published version outside GitHub Actions, authenticate to GitHub Packages with an authorized token and then install the scoped package:
 
@@ -102,7 +102,7 @@ Consumers route this scope to GitHub Packages with the committed `.npmrc`. To in
 pnpm add @shukhratisakdjanov-cyber/faster-mobile@0.1.0
 ```
 
-The repository must first exist at the `repository` URL in `package.json`; then configure the protected `github-packages` environment and set `PUBLISH_ENABLED=true` there before the first release. The current Builder Bob build also emits a CommonJS export-map warning that should be resolved before publishing externally.
+The repository must first exist at the `repository` URL in `package.json`; then configure the protected `github-packages` environment and set repository variable `PUBLISH_ENABLED=true` before the first release. The current Builder Bob build also emits a CommonJS export-map warning that should be resolved before publishing externally.
 
 ## Architecture
 
