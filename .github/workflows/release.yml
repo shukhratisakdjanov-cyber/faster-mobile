@@ -1,59 +1,86 @@
+# Display name shown in the GitHub Actions tab.
 name: Version and release package
 
+# Define the events that start this workflow.
 on:
-  # Turn merged changesets into a reviewed version PR or a release.
+  # Run automatically after a commit reaches the main branch.
   push:
+    # Limit push-triggered releases to main.
     branches: [main]
+  # Add a Run workflow button for manual execution.
   workflow_dispatch:
 
+# Define the GITHUB_TOKEN permissions granted to this workflow.
 permissions:
-  # Create version commits/tags and publish only this repository's package.
+  # Allow Changesets to create version commits and Git tags.
   contents: write
+  # Allow Changesets to create or update Version Packages pull requests.
   pull-requests: write
+  # Allow publishing the package to GitHub Packages.
   packages: write
 
+# Prevent more than one release from changing package state at a time.
 concurrency:
-  # Prevent version PRs and releases racing each other.
+  # Put every release run into the same concurrency group.
   group: github-packages-release
+  # Queue newer runs instead of cancelling a release already in progress.
   cancel-in-progress: false
 
+# Define the work performed by this workflow.
 jobs:
+  # Name the job that versions or publishes the package.
   publish:
-    # Publishing remains opt-in until the protected GitHub environment has
-    # been configured by the repository owner.
-    # Publish only from the canonical repository after an explicit opt-in.
+    # Confirm that this is the repository allowed to publish the package.
+    # Require the repository-level publishing safety switch to be enabled.
     if: >-
       github.repository == 'shukhratisakdjanov-cyber/faster-mobile' &&
       vars.PUBLISH_ENABLED == 'true'
-    # Apply any GitHub approval and branch/tag rules.
+    # Apply the github-packages environment's approval and protection rules.
     environment: github-packages
+    # Use a clean GitHub-hosted Ubuntu runner.
     runs-on: ubuntu-latest
+    # Run these setup, validation, and release steps in order.
     steps:
+      # Download the repository onto the runner.
       - uses: actions/checkout@v6
         with:
+          # Fetch complete history and tags required by release tooling.
           fetch-depth: 0
+      # Install the project's pinned pnpm version.
       - uses: pnpm/action-setup@v6
         with:
+          # Use the pnpm version declared for this project.
           version: 10.10.0
+      # Install Node and configure GitHub Packages for this scope.
       - uses: actions/setup-node@v6
         with:
+          # Use the Node.js version used for the release build.
           node-version: 22.14.0
+          # Send npm and pnpm registry requests to GitHub Packages.
           registry-url: https://npm.pkg.github.com
+          # Apply that registry configuration to this package scope.
           scope: '@shukhratisakdjanov-cyber'
-      # Reproduce the committed dependency tree.
+      # Install exactly the dependency versions recorded in the lockfile.
       - run: pnpm install --frozen-lockfile
-      # Re-run every library quality gate before release.
+      # Check source-code conventions before publishing.
       - run: pnpm lint
+      # Validate the public TypeScript contract before publishing.
       - run: pnpm typecheck
+      # Verify component behavior before publishing.
       - run: pnpm test
-      # Build and inspect the artifact that may be published.
+      # Generate distributable JavaScript and type declarations.
       - run: pnpm build
+      # Create and inspect the exact package tarball users will install.
       - run: pnpm pack:check
-      # Open a version PR, or publish after that PR is merged.
+      # Use Changesets to open a version PR or publish a versioned package.
       - uses: changesets/action@v2
         with:
+          # Run changeset version when pending changesets need a version PR.
           version-script: pnpm version-packages
+          # Run changeset publish after the versioned package reaches main.
           publish-script: pnpm release
+          # Authenticate Changesets to create commits, pull requests, and tags.
           github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
+          # Authenticate pnpm to publish to GitHub Packages.
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
