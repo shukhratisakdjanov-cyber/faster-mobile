@@ -24,7 +24,7 @@ jobs:
     # Publish only from the canonical repository after an explicit opt-in.
     if: >-
       github.repository == 'shukhratisakdjanov-cyber/faster-mobile' &&
-      vars.GITHUB_PACKAGES_PUBLISH_ENABLED == 'true'
+      vars.PUBLISH_ENABLED == 'true'
     # Apply any GitHub approval and branch/tag rules.
     environment: github-packages
     runs-on: ubuntu-latest
