@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
+    "types": ["jest"],
     "baseUrl": ".",
     "paths": {
       "@shukhratisakdjanov-cyber/faster-mobile": ["src/index.ts"]
