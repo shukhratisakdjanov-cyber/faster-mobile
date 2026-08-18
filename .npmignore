@@ -1,0 +1,6 @@
+docs/
+example/
+tests/
+.github/
+.maestro/
+*.config.js

@@ -1,0 +1,15 @@
+appId: com.fastermobileexample
+name: Core component journey
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: "email-input"
+- inputText: "invalid-email"
+- assertVisible: "Enter a valid email"
+- tapOn: "Clear input"
+- inputText: "person@example.com"
+- tapOn: "Open confirmation dialog"
+- assertVisible: "Confirm action"
+- tapOn: "Confirm"
+- assertVisible: "Action confirmed"

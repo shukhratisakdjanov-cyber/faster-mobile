@@ -1,0 +1,68 @@
+name: Continuous integration
+
+on:
+  # Validate proposed changes and the main branch.
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  # Validate the publishable library first.
+  library:
+    name: Library quality and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      # Reproduce the committed dependency tree.
+      - run: pnpm install --frozen-lockfile
+      # Enforce source-code conventions.
+      - run: pnpm lint
+      # Validate the public TypeScript contract.
+      - run: pnpm typecheck
+      # Verify component behavior.
+      - run: pnpm test
+      # Generate distributable JavaScript and declarations.
+      - run: pnpm build
+      # Inspect the exact package artifact.
+      - run: pnpm pack:check
+
+  # Validate the consumer host only after the library is healthy.
+  native-host:
+    name: Native host static checks
+    needs: library
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            example/native/pnpm-lock.yaml
+      # The local file dependency runs the library prepare script, so install
+      # the library toolchain before installing the native host.
+      # Install the library toolchain required by the local file dependency.
+      - run: pnpm install --frozen-lockfile
+      # Reproduce the native host's dependency tree.
+      - run: pnpm --dir example/native install --frozen-lockfile
+      # Refresh the generated Storybook story registry.
+      - run: pnpm --dir example/native storybook:generate
+      # Fail when a generated registry was not committed.
+      - run: git diff --exit-code -- example/native/.rnstorybook/storybook.requires.ts
+      # Validate native host types and source conventions.
+      - run: pnpm --dir example/native typecheck
+      - run: pnpm --dir example/native lint
+      # Verify the host renders with the public package API.
+      - run: pnpm --dir example/native exec jest --runInBand

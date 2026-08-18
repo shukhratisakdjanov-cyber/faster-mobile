@@ -1,0 +1,20 @@
+export const primitives = {
+  color: {
+    white: '#FFFFFF',
+    neutral200: '#EEEEEE',
+    neutral300: '#E1E1E1',
+    neutral400: '#CACACA',
+    neutral600: '#4B4B4B',
+    primary300: '#B0EBEC',
+    primary600: '#15C5CE',
+    primary700: '#00ABB6',
+    danger600: '#F64C4C',
+    danger700: '#D93434',
+    transparent: 'transparent',
+  },
+  spacing: { 4: 4, 8: 8, 12: 12, 16: 16, 24: 24 },
+  radius: { 4: 4, 8: 8 },
+  fontSize: { 12: 12, 14: 14, 16: 16, 20: 20 },
+  lineHeight: { 18: 18, 22: 22, 24: 24, 28: 28 },
+  fontWeight: { medium: '500' as const },
+} as const;

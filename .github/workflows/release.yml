@@ -1,0 +1,59 @@
+name: Version and release package
+
+on:
+  # Turn merged changesets into a reviewed version PR or a release.
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  # Create version commits/tags and publish only this repository's package.
+  contents: write
+  pull-requests: write
+  packages: write
+
+concurrency:
+  # Prevent version PRs and releases racing each other.
+  group: github-packages-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Publishing remains opt-in until the protected GitHub environment has
+    # been configured by the repository owner.
+    # Publish only from the canonical repository after an explicit opt-in.
+    if: >-
+      github.repository == 'shukhratisakdjanov-cyber/faster-mobile' &&
+      vars.GITHUB_PACKAGES_PUBLISH_ENABLED == 'true'
+    # Apply any GitHub approval and branch/tag rules.
+    environment: github-packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.14.0
+          registry-url: https://npm.pkg.github.com
+          scope: '@shukhratisakdjanov-cyber'
+      # Reproduce the committed dependency tree.
+      - run: pnpm install --frozen-lockfile
+      # Re-run every library quality gate before release.
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      # Build and inspect the artifact that may be published.
+      - run: pnpm build
+      - run: pnpm pack:check
+      # Open a version PR, or publish after that PR is merged.
+      - uses: changesets/action@v2
+        with:
+          version-script: pnpm version-packages
+          publish-script: pnpm release
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
