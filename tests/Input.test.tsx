@@ -18,4 +18,34 @@ describe('Input', () => {
     expect(screen.getByText('Enter a valid email')).toBeTruthy();
     expect(screen.getByLabelText('Email').props.editable).toBe(false);
   });
+
+  it('toggles password visibility with an accessible control', () => {
+    const screen = render(<Input label="Password" secureTextEntry passwordToggle />);
+
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
+    fireEvent.press(screen.getByRole('button', { name: 'Show password' }));
+
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(false);
+    expect(screen.getByRole('button', { name: 'Hide password' })).toBeTruthy();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Hide password' }));
+
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
+  });
+
+  it('disables the password visibility control with the input', () => {
+    const screen = render(<Input label="Password" secureTextEntry passwordToggle disabled />);
+
+    const toggle = screen.getByRole('button', { name: 'Show password' });
+    fireEvent.press(toggle);
+
+    expect(toggle.props.accessibilityState).toMatchObject({ disabled: true });
+    expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true);
+  });
+
+  it('renders the password control only for secure inputs', () => {
+    const screen = render(<Input label="Password" passwordToggle />);
+
+    expect(screen.queryByRole('button', { name: 'Show password' })).toBeNull();
+  });
 });
