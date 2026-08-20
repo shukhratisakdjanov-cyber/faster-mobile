@@ -70,7 +70,7 @@ import { Button, ThemeProvider } from '@shukhratisakdjanov-cyber/faster-mobile';
 </ThemeProvider>
 ```
 
-`Button` supports `primary`, `outline`, `ghost`, and `link` variants; `default` and `danger` tones; and small, medium, and large sizes. Native pressed state is derived by `Pressable`; disabled and loading buttons suppress presses and announce their accessibility state.
+`Button` supports `primary`, `outline`, `ghost`, and `link` variants; `default` and `danger` tones; and small, medium, and large sizes. Native pressed state is derived by `Pressable`; disabled and loading buttons suppress presses and announce their accessibility state. Set `loadingLabel` to localize or contextualize the loading indicator's accessible name.
 
 ## Consumer-package verification
 
