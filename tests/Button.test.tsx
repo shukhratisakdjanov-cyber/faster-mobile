@@ -29,4 +29,10 @@ describe('Button', () => {
       busy: true,
     });
   });
+
+  it('supports a custom accessibility label for the loading indicator', () => {
+    const screen = render(<Button loading loadingLabel="Saving order">Continue</Button>);
+
+    expect(screen.getByLabelText('Saving order')).toBeTruthy();
+  });
 });

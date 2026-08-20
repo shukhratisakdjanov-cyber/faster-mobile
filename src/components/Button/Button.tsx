@@ -12,6 +12,7 @@ export interface ButtonProps extends Omit<PressableProps, 'accessibilityRole' | 
   size?: ButtonSize;
   disabled?: boolean;
   loading?: boolean;
+  loadingLabel?: string;
   fullWidth?: boolean;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
@@ -26,6 +27,7 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(fu
     size = 'medium',
     disabled = false,
     loading = false,
+    loadingLabel = 'Loading',
     fullWidth = false,
     leadingIcon,
     trailingIcon,
@@ -70,7 +72,7 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(fu
         style,
       ]}
     >
-      {loading ? <ActivityIndicator accessibilityLabel="Loading" color={textColor} /> : leadingIcon}
+      {loading ? <ActivityIndicator accessibilityLabel={loadingLabel} color={textColor} /> : leadingIcon}
       <View pointerEvents="none" style={styles.content}>
         <Text style={[theme.typography.button[size], { color: isDisabled && variant !== 'primary' ? theme.colors.text.disabled : textColor }]}>
           {children}

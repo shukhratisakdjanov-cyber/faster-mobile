@@ -70,7 +70,7 @@ import { Button, ThemeProvider } from '@shukhratisakdjanov-cyber/faster-mobile';
 </ThemeProvider>
 ```
 
-`Button` supports `primary`, `outline`, `ghost`, and `link` variants; `default` and `danger` tones; and small, medium, and large sizes. Native pressed state is derived by `Pressable`; disabled and loading buttons suppress presses and announce their accessibility state.
+`Button` supports `primary`, `outline`, `ghost`, and `link` variants; `default` and `danger` tones; and small, medium, and large sizes. Native pressed state is derived by `Pressable`; disabled and loading buttons suppress presses and announce their accessibility state. Set `loadingLabel` to localize or contextualize the loading indicator's accessible name.
 
 `Input` supports labels, helper and error text, disabled and clearable states, and standard native `TextInput` props. Set both `secureTextEntry` and `passwordToggle` to add an accessible Show/Hide password control.
 
